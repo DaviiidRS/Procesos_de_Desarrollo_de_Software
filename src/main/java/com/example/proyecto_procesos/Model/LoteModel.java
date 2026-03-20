@@ -1,33 +1,40 @@
 package com.example.proyecto_procesos.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductoModel {
+public class LoteModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_producto;
+    private Long id_lote;
 
-    private String nombre;
-
-    private String descripcion;
-
-    private Integer stock;
+    private String numeroLote;
 
     private LocalDate fechaVencimiento;
 
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Integer cantidad;
+
+    @ManyToOne
+    @JoinColumn(name = "id_producto")
     @JsonIgnore
-    private List<LoteModel> lotes;
+    private ProductoModel producto;
+
+    @Transient
+    private Long id_producto;
+
+    @PostLoad
+    public void asignarIds() {
+        if (producto != null) {
+            this.id_producto = producto.getId_producto();
+        }
+    }
 }
